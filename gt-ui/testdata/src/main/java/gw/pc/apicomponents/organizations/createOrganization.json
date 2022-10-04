@@ -1,0 +1,5 @@
+{
+  "requiredTemplateParameters": ["organizationName"],
+  "data": "<Please enter organization payload details.>"
+
+}

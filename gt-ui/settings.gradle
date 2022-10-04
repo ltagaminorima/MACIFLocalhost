@@ -1,0 +1,3 @@
+rootProject.name = 'gt-ui'
+include 'testdata'
+project(':testdata').projectDir = file('testdata')

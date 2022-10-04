@@ -1,0 +1,4 @@
+{
+  "requiredTemplateParameters": ["producerCode, organizationId"],
+  "data": "<Please enter producer code payload details.>"
+}

@@ -1,0 +1,4 @@
+{
+  "requiredTemplateParameters": ["userName", "roles", "groups", "useProducerCodeSecurity"],
+  "data": "<Please enter users payload details.>"
+}

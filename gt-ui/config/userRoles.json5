@@ -1,0 +1,24 @@
+{
+  roles : {
+    PC: [{
+      userrole: "<Please enter userrole>",
+      username: "<Please enter username>",
+      password: "<Please enter password>",
+    }],
+    CC: [{
+      userrole: "<Please enter userrole>",
+      username: "<Please enter username>",
+      password: "<Please enter password>"
+    }],
+    BC: [{
+      userrole: "<Please enter userrole>",
+      username: "<Please enter username>",
+      password: "<Please enter password>"
+    }],
+    CM: [{
+      userrole: "<Please enter userrole>",
+      username: "<Please enter username>",
+      password: "<Please enter password>"
+    }]
+  }
+}

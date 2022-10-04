@@ -1,0 +1,59 @@
+
+allprojects {
+    apply plugin: "java"
+    apply plugin: "java-library"
+    apply plugin: "idea"
+    sourceCompatibility = JavaVersion.VERSION_11
+
+    repositories {
+        maven { url rootProject.file('testdata/repository') }
+    }
+
+    dependencies {
+        runtime files(project.rootDir.toString() + "/libs/xray-" + xray_releaseVersion + ".zip")
+    }
+}
+
+task build(overwrite: true, dependsOn: 'prepareXrayModule')
+
+task copyXrayModuleFromRuntimeLibraries(type: Copy) {
+
+    from(configurations.runtime) {
+        include 'xray-' + xray_releaseVersion + '.zip'
+    }
+    into file("${buildDir}")
+}
+
+task prepareXrayModule(type: Copy, dependsOn: 'copyXrayModuleFromRuntimeLibraries') {
+
+    def inputFile = file("${buildDir}" + '/xray-' + xray_releaseVersion + '.zip')
+    def outputDir = file("${buildDir}/xray")
+
+    from zipTree(inputFile)
+    into outputDir
+}
+
+task xrayCucumberSync(type: Exec) {
+    def featureDir = xray_featureDir;
+    workingDir "${buildDir}/xray/main"
+    commandLine 'node', '--no-warnings', 'mainXrayCucumberScenarioSync.js', xray_projectId, featureDir
+}
+xrayCucumberSync.onlyIf { !xray_featureDir.isEmpty() }
+
+task xrayPrepareReport(type: Exec) {
+    workingDir "${buildDir}/xray/main"
+    commandLine 'node', '--no-warnings', 'mainXrayPrepareCucumberReport.js', xray_projectId, xray_featureDir, xray_reportsDir
+}
+xrayPrepareReport.onlyIf { !xray_featureDir.isEmpty() && !xray_reportsDir.isEmpty() }
+
+task xrayImportTestExecutions(type: Exec, dependsOn: 'xrayPrepareReport') {
+    workingDir "${buildDir}/xray/main"
+    commandLine 'node', '--no-warnings', 'mainXrayImportTestExecutions.js', xray_projectId, xray_featureDir, xray_reportsDir
+}
+xrayImportTestExecutions.onlyIf { !xray_featureDir.isEmpty() && !xray_reportsDir.isEmpty() }
+
+task xrayExportTestsFromJira(type: Exec) {
+    workingDir "${buildDir}/xray/main"
+    commandLine 'node', '--no-warnings', 'mainXrayCucumberExport.js', xray_filterId
+}
+xrayExportTestsFromJira.onlyIf { !xray_filterId.isEmpty() }

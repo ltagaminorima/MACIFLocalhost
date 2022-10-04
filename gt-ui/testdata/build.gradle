@@ -1,0 +1,80 @@
+apply plugin: "java"
+apply plugin: "java-library"
+apply plugin: "idea"
+sourceCompatibility = JavaVersion.VERSION_11
+
+repositories {
+    maven { url rootProject.file('repository') }
+}
+
+dependencies {
+    implementation files("../libs/gt-api-framework-" + gt_api_framework_releaseVersion + ".jar")
+    implementation group: 'io.cucumber', name: 'cucumber-junit', version: cucumberVersion
+    implementation group: 'io.cucumber', name: 'cucumber-java', version: cucumberVersion
+    implementation group: 'io.cucumber', name: 'cucumber-picocontainer', version: cucumberVersion
+
+    implementation group: 'com.intuit.karate', name: 'karate-junit4', version: karateVersion
+    implementation group: 'com.intuit.karate', name: 'karate-core', version: karateVersion
+    implementation group: 'com.intuit.karate', name: 'karate-gatling', version: karateVersion
+
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+    implementation group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.13'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'
+
+    implementation group: 'net.masterthought', name: 'cucumber-reporting', version: '4.7.0'
+    implementation group: 'io.zipkin.brave', name: 'brave', version: '5.7.0'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    implementation group: 'org.bitbucket.b_c', name: 'jose4j', version: '0.6.5'
+}
+
+// Exclusions for Checkmarx scan
+configurations {
+    compile.exclude group: "io.netty", module: "netty-codec"
+    compile.exclude group: "io.netty", module: "netty-codec-http"
+    compile.exclude group: "io.netty", module: "netty-codec-http2"
+    compile.exclude group: "io.netty", module: "netty-codec-socks"
+    compile.exclude group: "io.netty", module: "netty-codec-dns"
+    compile.exclude group: "org.apache.velocity", module: "velocity"
+    compile.exclude group: "com.sun.activation", module: "javax.activation"
+    compile.exclude group: "javax.jms", module: "javax.jms-api"
+}
+
+configurations.all {
+    resolutionStrategy.force 'junit:junit:4.13.2', 'com.google.guava:guava:30.1.1-jre',
+            'commons-codec:commons-codec:1.15', 'commons-io:commons-io:2.8.0',
+            'org.apache.httpcomponents:httpclient:4.5.13', 'org.apache.logging.log4j:log4j-core:2.17.0',
+            'io.pebbletemplates:pebble:3.1.5', 'org.yaml:snakeyaml:1.27',
+            'com.fasterxml.jackson.core:jackson-databind:2.12.2', 'commons-collections:commons-collections:3.2.2'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir file('src/main/java')
+        }
+        resources {
+            srcDir file('src/main/java')
+        }
+    }
+}
+
+/*
+* This is for creating the fat Jar distribution.
+*/
+task createTestDataJar(type: Jar) {
+    manifest {
+        attributes "Main-Class": "gw.util.GtApiBridge"
+    }
+
+    from (configurations.runtimeClasspath.findAll{
+        it.name.endsWith('jar')
+    }.collect { it.isDirectory() ? it : zipTree(it) }){
+        exclude ("log4j.properties")
+        exclude 'META-INF/*.RSA'
+        exclude 'META-INF/*.SF'
+        exclude 'META-INF/*.DSA'
+        exclude 'META-INF', 'META-INF/**'
+        exclude 'license','license/**'
+    }
+    with jar
+}

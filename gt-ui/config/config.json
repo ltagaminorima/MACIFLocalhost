@@ -1,0 +1,9 @@
+{
+  "PC_URL": "http://localhost:8180/pc/PolicyCenter.do",
+  "CC_URL": "<Please enter ClaimCenter app URL>",
+  "BC_URL": "<Please enter BillingCenter app URL>",
+  "CM_URL": "<Please enter ContactManager app URL>",
+  "feature_location_pattern": "policysolutions/macifPC/behaviortest/Feature/**/*.feature",
+  "glue_location_pattern": "policysolutions/macifPC/behaviortest/Step/**/*.js",
+  "allow_insecure_app_urls": "true"
+}
